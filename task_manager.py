@@ -1,3 +1,8 @@
+
+#updated multiple line comments into ''' ''' surrounded comment blocks 
+#added date_check function to avoid errors due to incorrect input
+#removed the first \n from the add task function and fixed the final .write segment
+
 #=====importing libraries===========
 from datetime import datetime
 #this is imported to allow the program to find the current date.
@@ -6,8 +11,8 @@ import os
 
 #=====Functions Section=======
 def reg_user():
-    #this loop allows the user to add a different username if it is found to be unique
-    #if the user doesnt enter a found username then the loop only runs once
+    '''this loop allows the user to add a different username if it is found to be unique
+    if the user doesnt enter a found username then the loop only runs once'''
     not_duplicate_user = False
     while not_duplicate_user == False:
         new_username = input("Please enter the username to be registered: ")
@@ -20,15 +25,15 @@ def reg_user():
             currentline = line
             currentline = currentline.replace("\n","")
             currentline = currentline.split(", ")
-            #by adding the names that have been checked to a new list
-            #an error message can be displayed at the end of checking rather than on every line
+            '''by adding the names that have been checked to a new list
+            an error message can be displayed at the end of checking rather than on every line'''
             usernames.append(currentline[0])
         if new_username not in usernames:
             not_duplicate_user = True
         else:
             print(f"{new_username} is already taken. Please enter an alternative username: ")
-        #If the username is unique then the function asks for their password
-        #then writes the information to the users.txt file
+        '''I'f the username is unique then the function asks for their password
+        then writes the information to the users.txt file'''
     user_registered = False
     usernamefile.close()
     #this loop repeats the password input procedure until both passwords match
@@ -49,7 +54,7 @@ def add_task():
     currentdate = datetime.now()
     taskfile = open('tasks.txt', 'a')
     #the file is opened in append mode as we are only adding data to the end of the file.
-    taskfile.write("\n")
+    #first writing of \n to the file has been removed to avoid errors
     taskfile.write(input("Please enter the user to whom the task is assigned: ") + (", "))
     taskfile.write(input("Please enter the title of the task:" ) + (", "))
     taskfile.write(input("Please enter the description of the task: ") + (", "))
@@ -60,8 +65,16 @@ def add_task():
     #%b format returns the short name of the month taken form the current time
     month_name = month_datetime.strftime("%b")
     taskfile.write(f"{currentdate.day} {month_name} {currentdate.year}, ")
-    taskfile.write(input("Please enter the due date of this task: ") + (", "))
-    taskfile.write("No\n") #marks the task as incomplete by default
+    #new date_checker loop to ensure the date is entered correctly
+    date_checker = False
+    while date_checker == False:
+        potential_due_date = input("Please enter the due date of this task dd mon yyyy: ")
+        if date_check(potential_due_date) == True:
+            date_checker = True
+        else:
+            print("Please enter a valid date")
+    taskfile.write((potential_due_date) + (", "))
+    taskfile.write(("No") + ("\n")) #marks the task as incomplete by default
     taskfile.close()
 def view_all():
     taskfile = open('tasks.txt', 'r')
@@ -87,8 +100,8 @@ def view_mine(current_username):
     Have_task = False
     #this boolean statement is only set to true if the user has a task in the file
     task_selection_dict = {}
-    #using a dictionary to build a list of numbers and link them with the tasks assigned to the user
-    #so during selection the number used is still linked to the correct task to change
+    '''using a dictionary to build a list of numbers and link them with the tasks assigned to the user
+    so during selection the number used is still linked to the correct task to change'''
     tasks_count = 0
     #This helps to build the dictionary and keeps the system flexible
     for line in taskfile:
@@ -116,14 +129,14 @@ def view_mine(current_username):
     else:
             print("\n ____________________________\n")
     taskfile.close()
-        #the process of editing and writing the changes to tasks is moved to a new function
-        #to improve redability and reduce the amount of indentations
+    '''the process of editing and writing the changes to tasks is moved to a new function
+        to improve redability and reduce the amount of indentations'''
     if Have_task == True:
         task_edit(task_selection_dict)
 def task_edit(task_selection_dict):
-    #The while loop keeps the user in the menu to select a task to edit or mark complete
-    #until they enter -1
-    #The ability to edit tasks is only needed if the user has a task to edit
+    '''The while loop keeps the user in the menu to select a task to edit or mark complete
+    until they enter -1
+    The ability to edit tasks is only needed if the user has a task to edit'''
     task_selection = input("Please select a task to edit by entering its Selection Number, Otherwise enter -1 to exit this menu: ")
     while task_selection != '-1':
         if task_selection in task_selection_dict:
@@ -144,23 +157,23 @@ def task_edit(task_selection_dict):
                         currentline = currentline.replace("\n", "")
                         currentline = currentline.split(", ")
                         if current_task == currentline[1] and currentline[5] == 'No':
-                            #this is only true if we are on the correct line
-                            #and the task is marked incomplete
-                            #With the task marked complete the file must be written in format
+                            '''this is only true if we are on the correct line
+                            and the task is marked incomplete
+                            With the task marked complete the file must be written in format'''
                             update = line.replace(" No", " Yes")
                             print("The task has been updated")
                             replacement = replacement + update
                         elif current_task == currentline[1] and currentline[5] == 'Yes':
-                            #if the task is the one selected to edit and also completed
-                            #nothing will change and the replacement will change nothing
+                            '''if the task is the one selected to edit and also completed
+                            nothing will change and the replacement will change nothing'''
                             print("This task is already complete")
                             replacement = replacement + line
                         else:
                             #if it is not the correct line the old line is kept as is.
                             replacement = replacement + line
                 taskfile.close()
-                #opening in write mode
-                #the string replacing the old tasks file is written to tasks.txt
+                '''opening in write mode
+                the string replacing the old tasks file is written to tasks.txt'''
                 taskfile = open('tasks.txt','w')
                 taskfile.write(replacement)
                 taskfile.close()
@@ -177,24 +190,31 @@ def task_edit(task_selection_dict):
                         currentline = currentline.replace("\n", "")
                         currentline = currentline.split(", ")
                         if current_task == currentline[1] and currentline[5] == 'No':
-                            #this is only true if we are on the correct line
-                            #and the task is incomplete
+                            '''this is only true if we are on the correct line
+                            and the task is incomplete'''
                             print("1: The due date ")
                             print("2: The user the task is assigned to ")
                             edit_choice = input("Please select which aspect of the task you would like to edit: ")
                             if edit_choice == '1':
-                                new_deadline = input("Please enter a new due date: ")
+                                #now uses date_check function to ensure the edited date is valid
+                                date_checker = False
+                                while date_checker == False:
+                                    new_deadline = input("Please enter a new due date (dd mon yyyy): ")
+                                    if date_check(new_deadline) == True:
+                                        date_checker = True
+                                    else:
+                                        print("Please enter a valid date")
+                                print("The task's due date has been updated! ")
                                 update = line.replace(f"{currentline[4]}", f"{new_deadline}")
                                 replacement = replacement + update
-                                print("The task's due date has been updated! ")
                             elif edit_choice == '2':
                                 new_user_assigned = input("Please enter the username of the person assigned the task: ")
                                 update = line.replace(f"{currentline[0]}", f"{new_user_assigned}")
                                 replacement = replacement + update
                                 print("The user assigned to the task has been updated! ")
                         elif current_task == currentline[1] and currentline[5] == 'Yes':
-                            #if the task is the one selected to edit and also completed
-                            #nothing will change and the replacement will change nothing
+                            '''if the task is the one selected to edit and also completed
+                            nothing will change and the replacement will change nothing'''
                             print("This task is complete and cannot be edited")
                             replacement = replacement + line
                         else:
@@ -232,9 +252,9 @@ def report_gen():
             currentline = line
             currentline = currentline.replace("\n", "")
             currentline = currentline.split(", ")
-            #this checks if the user assigned to the current task is already in the dictionary
-            #if they are one is added to the value linked to their name
-            #otherwise they are added and set to one
+            '''this checks if the user assigned to the current task is already in the dictionary
+            if they are one is added to the value linked to their name
+            otherwise they are added and set to one'''
             if currentline[0] in tasks_per_user:
                 tasks_per_user[currentline[0]] += 1
             else:
@@ -242,8 +262,8 @@ def report_gen():
             #the tasks completion status is also counted
             if currentline[5] == "Yes":
                 number_of_complete += 1
-                #as before this dictionary tracks how many each user has marked as complete
-                #linked to their username
+                '''as before this dictionary tracks how many each user has marked as complete
+                linked to their username'''
                 if currentline[0] in completed_per_user:
                     completed_per_user[currentline[0]] += 1
                 else:
@@ -268,13 +288,13 @@ def report_gen():
                 intdeadline.append(datetime.strptime(monthname, '%b').month)
                 #this changes the short name into the integer form of the month
                 intdeadline.append(int(deadline[2]))
-                #then it must be changed to the datetime type
-                #it is entered 2,1,0 because datetime is in the format yyyy mm dd
+                '''then it must be changed to the datetime type
+                it is entered 2,1,0 because datetime is in the format yyyy mm dd'''
                 deadline_date = datetime(intdeadline[2],intdeadline[1],intdeadline[0])
                 if currentdate.date() > deadline_date.date():
                     number_of_overdue += 1
-                    #a task is only outstanding if the current date is "smaller" than the deadline
-                    #this is also used to build the dictionary of overdue tasks for each user
+                    '''a task is only outstanding if the current date is "smaller" than the deadline
+                    this is also used to build the dictionary of overdue tasks for each user'''
                     if currentline[0] in overdue_per_user:
                         overdue_per_user[currentline[0]] += 1
                     else:
@@ -292,18 +312,18 @@ def report_gen():
             if currentline[0] not in tasks_per_user:
                 tasks_per_user[currentline[0]] = 0
     usernamefile.close()
-    #in the case that a user has no associated tasks, they will still be added to tasks per user
-    #with no other information in the other dictionaries they will have zero tasks assigned
-    #,complete, incomplete or overdue.
+    '''in the case that a user has no associated tasks, they will still be added to tasks per user
+    with no other information in the other dictionaries they will have zero tasks assigned
+    ,complete, incomplete or overdue.'''
     #calculating the percentages of all tasks
     task_incomplete_percentage = (number_of_incomplete/number_of_tasks)*100
     task_overdue_percentage = (number_of_overdue/number_of_tasks)*100
     #==========Generating report files section======
     task_overview_file = open('task_overview.txt','w')
-    #this creates the needed file, if it does not already exist
-    #if it does exist then it overwrites the old information
-    #the information from the Reading files section is then written in a user friendly manner
-    #but also in a manner that allows it to be read later in the display_statistics function
+    '''this creates the needed file, if it does not already exist
+    if it does exist then it overwrites the old information
+    the information from the Reading files section is then written in a user friendly manner
+    but also in a manner that allows it to be read later in the display_statistics function'''
     task_overview_file.write((f"Total Number of Tasks: {number_of_tasks}") + ("\n"))
     task_overview_file.write((f"Total Number of Completed Tasks: {number_of_complete}") + ("\n"))
     task_overview_file.write((f"Total Number of Incomplete Tasks: {number_of_incomplete}") + ("\n"))
@@ -311,10 +331,10 @@ def report_gen():
     task_overview_file.write((f"Current Percentage of Incomplete Tasks: {round(task_incomplete_percentage)}%") + ("\n"))
     task_overview_file.write((f"Current Percentage of Overdue Tasks: {round(task_overdue_percentage)}%") + ("\n"))
     task_overview_file.close()
-    #The same is now done for the user_overview file
-    #using the dictionary values linked to each username as a shared key
-    #then dividing by either the total amount or tasks or total amount for the user
-    #the multiplying by 100 and rounding to find a clean readable percentage for each category
+    '''The same is now done for the user_overview file
+    using the dictionary values linked to each username as a shared key
+    then dividing by either the total amount or tasks or total amount for the user
+    the multiplying by 100 and rounding to find a clean readable percentage for each category'''
     user_overview_file = open('user_overview.txt','w')
     for user in tasks_per_user:
         #calculating the percentages for current user, otherwise returns 0 as the percentage
@@ -344,8 +364,8 @@ def report_gen():
             overdue_user_percentage = round(overdue_user_percentage)
         else:
             overdue_user_percentage = 0
-        #this writes the information to the file in a user-friendly way
-        #that also allows it to be read in the display statistics function
+        '''this writes the information to the file in a user-friendly way
+        that also allows it to be read in the display statistics function'''
         user_overview_file.write((f"Username: {user}") + (", "))
         user_overview_file.write((f"Total Tasks: {tasks_per_user[user]}") + (", "))
         user_overview_file.write((f"Assigned: {user_assigned_percentage}%") + (", "))
@@ -381,6 +401,31 @@ def display_statistics():
                 #this prints all the information for each user in a block
             print("____________________________\n")
     user_overview_file.close()
+
+def date_check(string):
+#this function checks an entered string for its compatability with the date system
+    short_month_list = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+    #The string is split by a space as it is when being written to the tasks file or edited
+    string = string.split(" ")
+    #this try except block checks if they can be cast correctly. returns false otherwise
+    try:
+        string[0] = int(string[0])
+        string[2] = int(string[2])
+        string[1] = str(string[1])
+    except:
+        return False
+    #then the day and year are cast to int for the if statements below
+    string[0] = int(string[0])
+    string[2] = int(string[2])
+    month_name = string[1]
+    if  len(string[1]) == 3 and month_name.lower() in short_month_list:
+        '''This checks if the second item is a string 3 letters long 
+        and in the list of month names'''
+        if len(str(string[0])) == 2 and len(str(string[2])) == 4:
+            #Then the length of both ints is checked to be the correct length 
+            return True
+    else:
+        return False
 #====Login Section====
 usernames = list()
 passwords = list()
@@ -397,8 +442,8 @@ while login == False:
         currentline = line
         currentline = currentline.replace("\n","")
         currentline = currentline.split(", ")
-        #by adding the names that have been checked to a new list
-        #an error message can be displayed at the end of checking rather than on every line
+        '''by adding the names that have been checked to a new list
+        an error message can be displayed at the end of checking rather than on every line'''
         usernames.append(currentline[0])
         passwords.append(currentline[1])
         if currentline[0] == username_input:
@@ -414,9 +459,9 @@ while login == False:
 usernamefile.close()
 #the file is then closed as it will be opened in a different way when needed.
 while login == True:
-    #presenting the menu to the user and 
-    # making sure that the user input is coneverted to lower case.
-    # different options are visible to admin and normal users
+    '''presenting the menu to the user and 
+    making sure that the user input is coneverted to lower case.
+    different options are visible to admin and normal users'''
 #========Menu section=======
     if currentuser == 'admin':
         menu = input('''Select one of the following Options below:
@@ -435,8 +480,8 @@ va - View all tasks
 vm - view my task
 e - Exit
 ''').lower()
-    #calls the function that registers a new user and writes the entered data to the user.txt file
-    #the register user function is only avaliable to the administrator.
+    '''calls the function that registers a new user and writes the entered data to the user.txt file
+    the register user function is only avaliable to the administrator.'''
     if menu == 'r' and currentuser == 'admin':
         reg_user() 
     #Calls a function that creates a new task from entered data and writes it to the tasks.txt file
@@ -445,8 +490,8 @@ e - Exit
     #Calls a function that displays all tasks in the tasks.txt file in a user friendly manner
     elif menu == 'va':
         view_all()
-    #Calls a function that shows all tasks for the user, or prints a message if they have none.
-    #The function also allows them to select tasks to either mark them complete or edit some of their details
+        '''Calls a function that shows all tasks for the user, or prints a message if they have none.
+    The function also allows them to select tasks to either mark them complete or edit some of their details'''
     elif menu == 'vm':
         view_mine(currentuser)
     #Calls a function that generates report files based on the tasks and users status
